@@ -49,9 +49,19 @@ router.post("/create", authMiddleware, async (req: Request<{}, {}, todo>, res: R
 })
 
 router.get("/all", authMiddleware,  async (req: Request, res: Response) => {
+
+    const userId = await prisma.users.findUnique({
+        where:{
+            email: (req as any).user.email
+        },
+        select:{
+            id: true
+        }
+    }).then(user => user?.id);
+
     const todos =  await prisma.todos.findMany({
         where:{
-            userId: (req as any).user.id
+            userId: userId
         }
     })
     return res.json({
